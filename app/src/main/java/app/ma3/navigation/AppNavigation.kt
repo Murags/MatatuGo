@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.ma3.ui.screens.HomeScreen
 import app.ma3.ui.screens.ProfileScreen
+import app.ma3.ui.screens.RouteDetailsScreen
 
 @Composable
 fun AppNavigation(
@@ -21,12 +22,19 @@ fun AppNavigation(
     ) {
         composable(Routes.HOME) {
             HomeScreen(
-                onNavigateToProfile = { navController.navigate(Routes.PROFILE) }
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) }
             )
         }
 
         composable(Routes.PROFILE) {
             ProfileScreen(
+                onNavigateBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(Routes.ROUTE_DETAILS) {
+            RouteDetailsScreen(
                 onNavigateBack = { navController.navigateUp() }
             )
         }

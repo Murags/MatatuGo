@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.*
 
 @Composable
 fun HomeScreen(
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToRouteDetails: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -26,6 +27,10 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onNavigateToProfile) {
             Text("Go to Profile")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onNavigateToRouteDetails) {
+            Text("View Route Details")
         }
     }
 }

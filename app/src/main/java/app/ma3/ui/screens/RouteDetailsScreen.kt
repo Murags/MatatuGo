@@ -16,12 +16,13 @@ fun RouteDetailsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Sample data - in a real app, this would come from parameters or state
+    // Sample data - in a real app, this would come from parameters or state or props
+    // TODO: intergrate with retrofit for fetch these
     val sampleSteps = listOf(
         RouteStep(
             stepNumber = 1,
             instruction = "Board Matatu 32 at Kencom",
-            fare = "Ksh 50"
+            fare = "Ksh 50" // TODO CHANGE THIS TO NUMBER
         ),
         RouteStep(
             stepNumber = 2,
@@ -49,7 +50,6 @@ fun RouteDetailsScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Map section
         RouteMapPlaceholder(
             fromLocation = "Kencom",
             toLocation = "Buru Buru",
@@ -58,10 +58,9 @@ fun RouteDetailsScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Route steps
         RouteStepsList(
             steps = sampleSteps,
-            totalFare = "Ksh 120",
+            totalFare = "Ksh 120", // TODO CHANGE THIS TO NUMBER WHICH IS CALCULATED
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 

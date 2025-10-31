@@ -30,7 +30,7 @@ fun RouteStepItem(
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Step number circle
+
         Box(
             modifier = Modifier
                 .size(30.dp)
@@ -50,7 +50,6 @@ fun RouteStepItem(
 
         Spacer(modifier = Modifier.width(20.dp))
 
-        // Instruction text
         Text(
             text = step.instruction,
             fontSize = 16.sp,
@@ -61,7 +60,6 @@ fun RouteStepItem(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Fare text
         Text(
             text = step.fare,
             fontSize = 16.sp,
@@ -85,14 +83,12 @@ fun RouteStepsList(
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // Individual steps
             steps.forEach { step ->
                 RouteStepItem(step = step)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Total fare section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

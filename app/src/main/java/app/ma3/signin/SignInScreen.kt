@@ -19,6 +19,8 @@ import kotlin.collections.listOf
 import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
 import app.ma3.ui.theme.WarmWhite
+import androidx.compose.ui.text.font.FontWeight
+
 
 @Composable
 fun SignInScreen() {
@@ -45,14 +47,16 @@ fun SignInScreen() {
             Text(
                 text = "MatatuGo",
                 style = MaterialTheme.typography.headlineLarge,
-                color = MatatuOrange
+                color = MatatuOrange,
+                fontWeight = FontWeight.Bold
             )
 
             // Tagline
             Text(
                 text = "Navigate Kenya’s routes with ease.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray
+                color = Color(0xFF6B6B6B),
+                fontWeight = FontWeight.Medium
             )
         }
     }

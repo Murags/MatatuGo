@@ -37,7 +37,8 @@ data class Route(
 @Composable
 fun RouteResultsScreen(
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToRouteDetails: () -> Unit = {}
 ) {
     val routes = listOf(
         Route(
@@ -117,7 +118,7 @@ fun RouteResultsScreen(
 
             // Optimal Route Card
             item {
-                OptimalRouteCard(route = routes.first())
+                OptimalRouteCard(route = routes.first(), onNavigateToRouteDetails)
             }
 
             // Alternative Routes Section Header
@@ -191,7 +192,7 @@ fun RouteResultsScreen(
 }
 
 @Composable
-fun OptimalRouteCard(route: Route) {
+fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -387,7 +388,7 @@ fun OptimalRouteCard(route: Route) {
                     }
 
                     Button(
-                        onClick = { /* TODO */ },
+                        onClick = {onNavigateToRouteDetails()},
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFF97316)
                         ),

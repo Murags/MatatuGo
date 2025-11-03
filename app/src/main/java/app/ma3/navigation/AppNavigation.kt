@@ -10,6 +10,7 @@ import app.ma3.ui.screens.HomeScreen
 import app.ma3.ui.screens.ProfileScreen
 import app.ma3.ui.screens.RouteDetailsScreen
 import app.ma3.ui.screens.RouteResultsScreen
+import app.ma3.signin.SignInScreen
 
 @Composable
 fun AppNavigation(
@@ -18,14 +19,23 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME,
+        startDestination = Routes.SIGNIN,
         modifier = modifier
     ) {
-        composable(Routes.HOME) {
-            HomeScreen(
-                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
-                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) },
-                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) }
+
+        // This is retired should be used when you have new screen and dont want to go through whole flow
+//        composable(Routes.HOME) {
+//            HomeScreen(
+//                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+//                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) },
+//                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+//                onNavigatetoSignin = { navController.navigate(Routes.SIGNIN) }
+//            )
+//        }
+
+        composable(Routes.SIGNIN) {
+            SignInScreen(
+                onNavigateToRouteResults = {navController.navigate(Routes.ROUTE_RESULTS)}
             )
         }
 
@@ -43,7 +53,8 @@ fun AppNavigation(
 
         composable(Routes.ROUTE_RESULTS) {
             RouteResultsScreen(
-                onNavigateBack = { navController.navigateUp() }
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) }
             )
         }
     }

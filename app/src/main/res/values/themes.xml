@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.Ma3" parent="android:Theme.Material.Light.NoActionBar" />
+<!--        App brand colours-->
+<!--        <item name="android:colorPrimary">@color/colorPrimary</item> &lt;!&ndash; Orange accent&ndash;&gt;-->
+<!--        <item name="android:colorAccent">@color/colorSecondary</item> &lt;!&ndash; Red accent&ndash;&gt;-->
+<!--        <item name="android:colorSurface">@color/colorSurface</item> &lt;!&ndash; Default background for cards and sheets&ndash;&gt;-->
+
+<!--&lt;!&ndash;        System UI&ndash;&gt;-->
+<!--        <item name="android:statusBarColor">@color/colorPrimary</item> &lt;!&ndash; Orange status bar&ndash;&gt;-->
+<!--        <item name="android:navigationBarColor">@color/colorSecondary</item> &lt;!&ndash; Red navigation bar&ndash;&gt;-->
+<!--    </style>-->
+<!--    <style name="Theme.Ma3" parent="Theme.Material3.DayNight.NoActionBar">-->
+<!--        <item name="android:colorOnPrimary">@color/colorOnPrimary</item> &lt;!&ndash; Text/icons on orange&ndash;&gt;-->
+<!--        <item name="android:colorOnSurface">@color/colorOnSurface</item> &lt;!&ndash; Text color on white &ndash;&gt;-->
+<!--    </style>-->
+
+    <style name="Theme.Ma3.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ma3</item>
+    </style>
 </resources>

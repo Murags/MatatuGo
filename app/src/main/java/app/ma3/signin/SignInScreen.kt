@@ -36,7 +36,9 @@ import app.ma3.ui.theme.MatatuYellow
  * - Inline "Don't have an account? Sign Up" text
  */
 @Composable
-fun SignInScreen() {
+fun SignInScreen(
+    onNavigateToRouteResults: () -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -172,7 +174,7 @@ fun SignInScreen() {
 
             // Sign In button
             Button(
-                onClick = { /* TODO: handle sign in */ },
+                onClick = {onNavigateToRouteResults()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

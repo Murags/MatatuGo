@@ -12,7 +12,8 @@ import androidx.compose.ui.unit.*
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToRouteDetails: () -> Unit = {},
-    onNavigateToRouteResults: () -> Unit = {}
+    onNavigateToRouteResults: () -> Unit = {},
+    onNavigatetoSignin: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -25,10 +26,7 @@ fun HomeScreen(
             text = "Home Screen",
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onNavigateToProfile) {
-            Text("Go to Profile")
-        }
+
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onNavigateToRouteDetails) {
             Text("View Route Details")
@@ -36,6 +34,10 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onNavigateToRouteResults) {
             Text("View Route Results")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onNavigatetoSignin) {
+            Text("Signin")
         }
     }
 }

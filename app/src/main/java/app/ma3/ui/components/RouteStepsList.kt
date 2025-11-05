@@ -12,12 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class RouteStep(
     val stepNumber: Int,
     val instruction: String,
     val fare: String
-)
+): Parcelable
 
 @Composable
 fun RouteStepItem(

@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -23,54 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.ma3.ui.components.RouteHeader
 import androidx.compose.material3.Icon
-
-data class Route(
-    val from: String,
-    val to: String,
-    val cost: Int,
-    val duration: String,
-    val matatus: Int,
-    val isOptimal: Boolean = false
-    // TODO: add the logic for when two or more routes share the same optimal cost. Maybe we can look at distance next. Or display both?
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import app.ma3.data.repository.RouteData
+import app.ma3.ui.viewmodel.RouteResultsViewModel
 
 @Composable
 fun RouteResultsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    onNavigateToRouteDetails: () -> Unit = {}
+    onNavigateToRouteDetails: (RouteData) -> Unit = {},
+    viewModel: RouteResultsViewModel = viewModel()
 ) {
-    val routes = listOf(
-        Route(
-            from = "Kencom",
-            to = "Buruburu",
-            cost = 50,
-            duration = "25 min",
-            matatus = 1,
-            isOptimal = true
-        ),
-        Route(
-            from = "Kencom → City Stadium",
-            to = "Buruburu",
-            cost = 70,
-            duration = "30 min",
-            matatus = 2
-        ),
-        Route(
-            from = "Kencom → Muthurwa",
-            to = "Buruburu",
-            cost = 80,
-            duration = "35 min",
-            matatus = 2
-        ),
-        Route(
-            from = "Kencom → Jogoo Road → Jericho",
-            to = "Buruburu",
-            cost = 90,
-            duration = "40 min",
-            matatus = 3
-        )
-    ).sortedBy { it.cost }
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Helper to parse integer cost from formatted totalFare like "KSH 120"
+    fun RouteData.costInt(): Int = totalFare.filter { it.isDigit() }.toIntOrNull() ?: Int.MAX_VALUE
+    val routes = uiState.routes.sortedBy { it.costInt() }
 
     Column(
         modifier = modifier
@@ -89,100 +59,161 @@ fun RouteResultsScreen(
             onBackClick = onNavigateBack
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            // Best Route Section Header
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = "Best Route",
-                        tint = Color(0xFF059669),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Best Route",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1F2937)
-                    )
+            when {
+                uiState.isLoading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
                 }
-            }
 
-            // Optimal Route Card
-            item {
-                OptimalRouteCard(route = routes.first(), onNavigateToRouteDetails)
-            }
-
-            // Alternative Routes Section Header
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TrendingUp,
-                        contentDescription = "Alternative Routes",
-                        tint = Color(0xFF6B7280),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Alternative Routes",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1F2937)
-                    )
-                }
-            }
-
-            // Alternative Route Cards
-            items(routes.drop(1)) { route ->
-                AlternativeRouteCard(
-                    route = route,
-                    cheapestCost = routes.first().cost
-                )
-            }
-
-            // Info Tip
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFDEEBFF)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "💡",
-                            fontSize = 20.sp,
-                            modifier = Modifier.padding(end = 12.dp)
-                        )
-                        Column {
+                uiState.error != null -> {
+                    item {
+                        Column(
+                            modifier = Modifier.fillParentMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
                             Text(
-                                text = "Route Tip",
-                                style = MaterialTheme.typography.titleSmall,
+                                text = "Error: ${uiState.error}",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { viewModel.fetchRoutesByCoordinates(
+                                originLat = -1.308665872,
+                                originLon = 36.81243896,
+                                destLat = -1.264457703,
+                                destLon = 36.74703598,
+                                searchRadius = 100,
+                                alternatives = 2
+                            ) }) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
+
+                routes.isEmpty() -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No routes found for the given criteria.",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+
+                else -> {
+                    // Best Route Section Header
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = "Best Route",
+                                tint = Color(0xFF059669),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Best Route",
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1E3A8A)
+                                color = Color(0xFF1F2937)
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                    }
+
+                    // Optimal Route Card
+                    item {
+                        OptimalRouteCard(route = routes.first(), onNavigateToRouteDetails)
+                    }
+
+                    // Alternative Routes Section Header
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.TrendingUp,
+                                contentDescription = "Alternative Routes",
+                                tint = Color(0xFF6B7280),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Routes are sorted by total cost. The cheapest option considers fare and then distance (if fares are the same).",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF1E40AF)
+                                text = "Alternative Routes",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1F2937)
                             )
+                        }
+                    }
+
+                    // Alternative Route Cards
+                    if (routes.size > 1) {
+                        items(routes.drop(1)) { route ->
+                            AlternativeRouteCard(
+                                route = route,
+                                cheapestCost = routes.first().costInt()
+                            )
+                        }
+                    }
+
+                    // Info Tip
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFDEEBFF)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "💡",
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+                                Column {
+                                    Text(
+                                        text = "Route Tip",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF1E3A8A)
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Routes are sorted by total cost. The cheapest option considers fare and then distance (if fares are the same).",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF1E40AF)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -192,7 +223,7 @@ fun RouteResultsScreen(
 }
 
 @Composable
-fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
+fun OptimalRouteCard(route: RouteData, onNavigateToRouteDetails: (RouteData) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,7 +285,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = route.from,
+                            text = route.fromLocation,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -268,7 +299,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = route.to,
+                            text = route.toLocation,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -315,7 +346,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = route.duration,
+                                text = "${route.steps.size} steps",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -349,7 +380,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = route.matatus.toString(),
+                                text = route.steps.count().toString(),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -379,7 +410,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                                 color = Color.White.copy(alpha = 0.9f)
                             )
                             Text(
-                                text = "Ksh ${route.cost}",
+                                text = route.totalFare,
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -388,7 +419,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                     }
 
                     Button(
-                        onClick = {onNavigateToRouteDetails()},
+                        onClick = { onNavigateToRouteDetails(route) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFF97316)
                         ),
@@ -407,7 +438,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
 }
 
 @Composable
-fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
+fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -435,8 +466,8 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 val routePath = run {
-                    val fromTrim = route.from.trim()
-                    val toTrim = route.to.trim()
+                    val fromTrim = route.fromLocation.trim()
+                    val toTrim = route.toLocation.trim()
                     // if 'from' already contains the destination at the end, don't append it again
                     if (fromTrim.endsWith(toTrim, ignoreCase = true)) {
                         fromTrim
@@ -477,7 +508,7 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = route.duration,
+                            text = "${route.steps.size} steps",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF6B7280)
                         )
@@ -492,7 +523,7 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${route.matatus} matatu${if (route.matatus > 1) "s" else ""}",
+                            text = "Stops ${route.steps.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF6B7280)
                         )
@@ -511,12 +542,12 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                             color = Color(0xFF6B7280)
                         )
                         Text(
-                            text = "Ksh ${route.cost}",
+                            text = route.totalFare,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "+Ksh ${route.cost - cheapestCost} more",
+                            text = "Diff +${(route.totalFare.filter { it.isDigit() }.toIntOrNull() ?: 0) - cheapestCost}",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFFF97316)
                         )

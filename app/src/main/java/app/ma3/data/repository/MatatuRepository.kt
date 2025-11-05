@@ -13,52 +13,6 @@ import kotlinx.parcelize.Parcelize
 class RouteRepository(
     private val apiService: MatatuApiService = NetworkModule.apiService
 ) {
-
-    suspend fun getRouteDetails(routeId: String): Result<RouteData> {
-        return try {
-            val response = apiService.getRouteDetails(routeId)
-
-            if (response.isSuccessful && response.body() != null) {
-                val apiResponse = response.body()!!
-
-                Result.success(RouteData(
-                    id = apiResponse.id ?: routeId,
-                    fromLocation = apiResponse.from ?: "Unknown",
-                    toLocation = apiResponse.to ?: "Unknown",
-                    steps = RouteMapper.toRouteSteps(apiResponse),
-                    totalFare = RouteMapper.formatTotalFare(apiResponse)
-                ))
-            } else {
-                Result.failure(Exception("API Error: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun searchRoutes(from: String, to: String): Result<List<RouteData>> {
-        return try {
-            val response = apiService.searchRoutes(from, to)
-
-            if (response.isSuccessful && response.body() != null) {
-                val routes = response.body()!!.map { apiResponse ->
-                    RouteData(
-                        id = apiResponse.id ?: "unknown",
-                        fromLocation = apiResponse.from ?: from,
-                        toLocation = apiResponse.to ?: to,
-                        steps = RouteMapper.toRouteSteps(apiResponse),
-                        totalFare = RouteMapper.formatTotalFare(apiResponse)
-                    )
-                }
-                Result.success(routes)
-            } else {
-                Result.failure(Exception("Search failed: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun searchRoutesByCoordinates(
         originLat: Double,
         originLon: Double,

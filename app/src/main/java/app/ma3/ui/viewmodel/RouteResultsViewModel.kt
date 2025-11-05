@@ -28,28 +28,6 @@ class RouteResultsViewModel(
         )
     }
 
-    fun fetchRoutes(from: String, to: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-
-            repository.searchRoutes(from, to).fold(
-                onSuccess = { routes ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        routes = routes,
-                        error = null
-                    )
-                },
-                onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = e.message ?: "Failed to load routes"
-                    )
-                }
-            )
-        }
-    }
-
     fun fetchRoutesByCoordinates(
         originLat: Double,
         originLon: Double,

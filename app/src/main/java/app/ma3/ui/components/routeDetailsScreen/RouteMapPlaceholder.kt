@@ -1,4 +1,4 @@
-package app.ma3.ui.components
+package app.ma3.ui.components.routeDetailsScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

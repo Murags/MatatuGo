@@ -7,4 +7,5 @@ object Routes {
 
     const val ROUTE_RESULTS = "route_results"
     const val SIGNIN = "signin"
+    const val HELP = "help"
 }

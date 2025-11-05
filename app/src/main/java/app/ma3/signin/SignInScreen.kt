@@ -37,6 +37,7 @@ import app.ma3.ui.theme.MatatuYellow
  */
 @Composable
 fun SignInScreen(
+    onNavigateToHomeScreen: () -> Unit = {},
     onNavigateToRouteResults: () -> Unit = {},
 ) {
     Box(
@@ -174,7 +175,7 @@ fun SignInScreen(
 
             // Sign In button
             Button(
-                onClick = {onNavigateToRouteResults()},
+                onClick = {onNavigateToHomeScreen()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

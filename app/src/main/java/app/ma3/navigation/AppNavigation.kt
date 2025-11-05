@@ -12,6 +12,7 @@ import app.ma3.ui.screens.RouteDetailsScreen
 import app.ma3.ui.screens.RouteResultsScreen
 import app.ma3.ui.screens.HelpScreen
 import app.ma3.signin.SignInScreen
+import app.ma3.ui.screens.SplashScreen
 
 @Composable
 fun AppNavigation(
@@ -20,9 +21,18 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.SIGNIN,
+        startDestination = Routes.SPLASH_SCREEN,
         modifier = modifier
     ) {
+        composable(Routes.SPLASH_SCREEN) {
+            // For now, we navigate directly to the SignIn screen after splash
+            SplashScreen (
+            onNavigateToSignIn = { navController.navigate(Routes.SIGNIN) {
+                popUpTo(Routes.SPLASH_SCREEN) { inclusive = true }
+            }
+            }
+            )
+        }
 
         // This is retired should be used when you have new screen and dont want to go through whole flow
         composable(Routes.HOME) {

@@ -9,11 +9,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.ma3.ui.components.*
 import app.ma3.data.repository.RouteData
+import app.ma3.ui.components.publicComponents.RouteHeader
+import app.ma3.ui.components.routeDetailsScreen.RouteMapPlaceholder
+import app.ma3.ui.components.routeDetailsScreen.RouteStep
+import app.ma3.ui.components.routeDetailsScreen.RouteStepsList
+import app.ma3.ui.theme.LightGrayBg
+import app.ma3.ui.theme.WarmWhite
 
 @Composable
 fun RouteDetailsScreen(
@@ -41,8 +44,8 @@ fun RouteDetailsScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFFFFDF7), // #FFFDF7
-                        Color(0xFFF1F1F1)  // #F1F1F1
+                        WarmWhite,
+                        LightGrayBg
                     )
                 )
             )

@@ -1,4 +1,4 @@
-package app.ma3.ui.components
+package app.ma3.ui.components.publicComponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

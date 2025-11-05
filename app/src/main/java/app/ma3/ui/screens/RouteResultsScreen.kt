@@ -1,15 +1,11 @@
 package app.ma3.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,16 +13,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import app.ma3.ui.components.RouteHeader
-import androidx.compose.material3.Icon
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.ma3.data.repository.RouteData
+import app.ma3.ui.components.publicComponents.RouteHeader
+import app.ma3.ui.components.routeResultsScreen.OptimalRouteCard
+import app.ma3.ui.components.routeResultsScreen.AlternativeRouteCard
+import app.ma3.ui.components.routeResultsScreen.RouteTipCard
+import app.ma3.ui.theme.*
 import app.ma3.ui.viewmodel.RouteResultsViewModel
 
 @Composable
@@ -48,8 +45,8 @@ fun RouteResultsScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFFFFDF7),
-                        Color(0xFFF1F1F1)
+                        WarmWhite,
+                        LightGrayBg
                     )
                 )
             )
@@ -130,7 +127,7 @@ fun RouteResultsScreen(
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "Best Route",
-                                tint = Color(0xFF059669),
+                                tint = GreenPrimary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -138,7 +135,7 @@ fun RouteResultsScreen(
                                 text = "Best Route",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1F2937)
+                                color = GraySectionTitle
                             )
                         }
                     }
@@ -157,7 +154,7 @@ fun RouteResultsScreen(
                             Icon(
                                 imageVector = Icons.Filled.TrendingUp,
                                 contentDescription = "Alternative Routes",
-                                tint = Color(0xFF6B7280),
+                                tint = GraySectionIcon,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -165,7 +162,7 @@ fun RouteResultsScreen(
                                 text = "Alternative Routes",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1F2937)
+                                color = GraySectionTitle
                             )
                         }
                     }
@@ -180,392 +177,9 @@ fun RouteResultsScreen(
                         }
                     }
 
-                    // Info Tip
+                    // Route Tip Card
                     item {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFDEEBFF)
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text(
-                                    text = "💡",
-                                    fontSize = 20.sp,
-                                    modifier = Modifier.padding(end = 12.dp)
-                                )
-                                Column {
-                                    Text(
-                                        text = "Route Tip",
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF1E3A8A)
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Routes are sorted by total cost. The cheapest option considers fare and then distance (if fares are the same).",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color(0xFF1E40AF)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun OptimalRouteCard(route: RouteData, onNavigateToRouteDetails: (RouteData) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color(0xFF059669).copy(alpha = 0.3f)
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF0FDF4)
-        ),
-        border = BorderStroke(2.dp, Color(0xFF10B981))
-    ) {
-        Box {
-            // "CHEAPEST" Badge
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopEnd),
-                color = Color(0xFF059669),
-                shape = RoundedCornerShape(bottomStart = 16.dp, topEnd = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "CHEAPEST",
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Route Path
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(Color(0xFF059669), shape = RoundedCornerShape(6.dp))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = route.fromLocation,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Text(
-                        text = "→",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color(0xFF059669)
-                    )
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = route.toLocation,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(Color(0xFFF97316), shape = RoundedCornerShape(6.dp))
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Stats Grid
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.7f)
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFBBF7D0))
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.AccessTime,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = Color(0xFF6B7280)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Duration",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF6B7280)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "${route.steps.size} steps",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.7f)
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFBBF7D0))
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.DirectionsBus,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = Color(0xFF6B7280)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Matatus",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF6B7280)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = route.steps.count().toString(),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Price and Button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        color = Color(0xFF059669),
-                        shape = RoundedCornerShape(12.dp),
-                        shadowElevation = 4.dp
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-                        ) {
-                            Text(
-                                text = "Total Cost",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                            Text(
-                                text = route.totalFare,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-                    }
-
-                    Button(
-                        onClick = { onNavigateToRouteDetails(route) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFF97316)
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                    ) {
-                        Text(
-                            text = "View Details",
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        border = BorderStroke(2.dp, Color(0xFFE5E7EB)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            // Route Path
-            Row(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(Color(0xFF3B82F6), shape = RoundedCornerShape(4.dp))
-                        .padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                val routePath = run {
-                    val fromTrim = route.fromLocation.trim()
-                    val toTrim = route.toLocation.trim()
-                    // if 'from' already contains the destination at the end, don't append it again
-                    if (fromTrim.endsWith(toTrim, ignoreCase = true)) {
-                        fromTrim
-                    } else {
-                        "$fromTrim → $toTrim"
-                    }
-                }
-
-                Text(
-                    text = routePath,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    softWrap = true,
-                    maxLines = 2,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Stats
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.AccessTime,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Color(0xFF6B7280)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${route.steps.size} steps",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF6B7280)
-                        )
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.DirectionsBus,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Color(0xFF6B7280)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Stops ${route.steps.size}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF6B7280)
-                        )
-                    }
-                }
-
-                // Price and Button
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "Cost",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF6B7280)
-                        )
-                        Text(
-                            text = route.totalFare,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Diff +${(route.totalFare.filter { it.isDigit() }.toIntOrNull() ?: 0) - cheapestCost}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFFF97316)
-                        )
-                    }
-
-                    Button(
-                        onClick = { /* TODO */ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFF3F4F6)
-                        ),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "View",
-                            color = Color(0xFF374151),
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        RouteTipCard()
                     }
                 }
             }

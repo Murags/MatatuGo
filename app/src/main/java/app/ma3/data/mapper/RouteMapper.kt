@@ -5,7 +5,7 @@ import app.ma3.data.model.CoordinateRoutesResponse
 import app.ma3.data.model.CoordinateRoute
 import app.ma3.data.model.RouteSegment
 import app.ma3.data.repository.RouteData
-import app.ma3.ui.components.RouteStep
+import app.ma3.ui.components.routeDetailsScreen.RouteStep
 
 /**
  * Simple mapper to convert API responses to UI models

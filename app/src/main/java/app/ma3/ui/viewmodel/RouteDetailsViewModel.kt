@@ -3,7 +3,7 @@ package app.ma3.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.ma3.data.repository.RouteRepository
-import app.ma3.ui.components.RouteStep
+import app.ma3.ui.components.routeDetailsScreen.RouteStep
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,14 +15,14 @@ import kotlinx.coroutines.launch
 class RouteDetailsViewModel(
     private val repository: RouteRepository = RouteRepository()
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(RouteDetailsUiState())
     val uiState: StateFlow<RouteDetailsUiState> = _uiState.asStateFlow()
-    
+
     fun loadRouteDetails(routeId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
             repository.getRouteDetails(routeId).fold(
                 onSuccess = { routeData ->
                     _uiState.value = _uiState.value.copy(
@@ -43,11 +43,11 @@ class RouteDetailsViewModel(
             )
         }
     }
-    
+
     fun searchRoutes(from: String, to: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
             repository.searchRoutes(from, to).fold(
                 onSuccess = { routes ->
                     if (routes.isNotEmpty()) {
@@ -76,11 +76,11 @@ class RouteDetailsViewModel(
             )
         }
     }
-    
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
-    
+
     fun retry() {
         val currentState = _uiState.value
         // Simple retry logic - you can enhance this later

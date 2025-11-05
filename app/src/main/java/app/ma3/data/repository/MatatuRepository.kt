@@ -3,7 +3,7 @@ package app.ma3.data.repository
 import app.ma3.data.api.MatatuApiService
 import app.ma3.data.mapper.RouteMapper
 import app.ma3.data.network.NetworkModule
-import app.ma3.ui.components.RouteStep
+import app.ma3.ui.components.routeDetailsScreen.RouteStep
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 

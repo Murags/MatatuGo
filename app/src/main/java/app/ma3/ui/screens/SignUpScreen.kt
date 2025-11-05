@@ -36,7 +36,10 @@ import app.ma3.ui.theme.MatatuYellow
  * - Inline "Already have an account? Sign In" link
  */
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    onNavigateToSignIn: () -> Unit = {},
+    onSignUpSuccess: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -167,7 +170,7 @@ fun SignUpScreen() {
 
             // Create Account Button
             Button(
-                onClick = { /* TODO: handle sign up */ },
+                onClick = { onSignUpSuccess() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -195,7 +198,7 @@ fun SignUpScreen() {
                     color = Color(0xFF6B6B6B),
                     fontSize = 14.sp
                 )
-                TextButton(onClick = { /* TODO: navigate to Sign In */ }) {
+                TextButton(onClick = { onNavigateToSignIn() }) {
                     Text(
                         text = "Sign In",
                         color = MatatuOrange,

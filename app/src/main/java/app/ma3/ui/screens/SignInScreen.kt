@@ -1,4 +1,4 @@
-package app.ma3.signin
+package app.ma3.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

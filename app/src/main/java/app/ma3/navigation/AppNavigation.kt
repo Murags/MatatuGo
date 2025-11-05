@@ -22,16 +22,17 @@ fun AppNavigation(
         startDestination = Routes.SIGNIN,
         modifier = modifier
     ) {
-
-        // This is retired should be used when you have new screen and dont want to go through whole flow
-//        composable(Routes.HOME) {
-//            HomeScreen(
-//                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
-//                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) },
-//                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
-//                onNavigatetoSignin = { navController.navigate(Routes.SIGNIN) }
-//            )
-//        }
+        /*
+        // This is retired should be used when you have new screen and don't want to go through whole flow
+        composable(Routes.HOME) {
+            HomeScreen(
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) },
+                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onNavigateToSignIn = { navController.navigate(Routes.SIGNIN) }
+            )
+        }
+        */
 
         composable(Routes.SIGNIN) {
             SignInScreen(

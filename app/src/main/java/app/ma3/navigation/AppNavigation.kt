@@ -12,6 +12,7 @@ import app.ma3.ui.screens.RouteDetailsScreen
 import app.ma3.ui.screens.RouteResultsScreen
 import app.ma3.ui.screens.HelpScreen
 import app.ma3.signin.SignInScreen
+import app.ma3.data.repository.RouteData
 
 @Composable
 fun AppNavigation(
@@ -47,15 +48,25 @@ fun AppNavigation(
         }
 
         composable(Routes.ROUTE_DETAILS) {
+            val selectedRoute = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<RouteData>("selectedRoute")
+
             RouteDetailsScreen(
-                onNavigateBack = { navController.navigateUp() }
+                onNavigateBack = { navController.navigateUp() },
+                routeData = selectedRoute
             )
         }
 
         composable(Routes.ROUTE_RESULTS) {
             RouteResultsScreen(
                 onNavigateBack = { navController.navigateUp() },
-                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) }
+                onNavigateToRouteDetails = { route ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selectedRoute", route)
+                    navController.navigate(Routes.ROUTE_DETAILS)
+                }
             )
         }
 

@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.ma3.data.repository.RouteData
 import app.ma3.ui.theme.GraySectionIcon
 import app.ma3.ui.theme.GreenBadge
 import app.ma3.ui.theme.GreenBorder
@@ -41,7 +42,7 @@ import app.ma3.ui.theme.GreenStatBorder
 import app.ma3.ui.theme.OrangePrimary
 
 @Composable
-fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
+fun OptimalRouteCard(route: RouteData, onNavigateToRouteDetails: (RouteData) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,7 +104,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = route.from,
+                            text = route.fromLocation,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -117,7 +118,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = route.to,
+                            text = route.toLocation,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -157,14 +158,14 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "Duration",
+                                    text = "Steps",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = GraySectionIcon
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = route.duration,
+                                text = "${route.steps.size} steps",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -198,7 +199,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = route.matatus.toString(),
+                                text = route.steps.count().toString(),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -228,7 +229,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                                 color = Color.White.copy(alpha = 0.9f)
                             )
                             Text(
-                                text = "Ksh ${route.cost}",
+                                text = route.totalFare,
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -237,7 +238,7 @@ fun OptimalRouteCard(route: Route, onNavigateToRouteDetails: () -> Unit) {
                     }
 
                     Button(
-                        onClick = {onNavigateToRouteDetails()},
+                        onClick = { onNavigateToRouteDetails(route) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = OrangePrimary
                         ),

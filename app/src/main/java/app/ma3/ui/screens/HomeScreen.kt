@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.ma3.ui.components.RouteMapPlaceholder
-import app.ma3.ui.components.RouteHeader
+import app.ma3.ui.components.routeDetailsScreen.RouteMapPlaceholder
+import app.ma3.ui.components.publicComponents.RouteHeader
 
 @Composable
 fun HomeScreen(

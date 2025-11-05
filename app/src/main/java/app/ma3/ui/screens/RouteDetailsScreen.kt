@@ -4,10 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
+import app.ma3.data.repository.RouteData
 import app.ma3.ui.components.publicComponents.RouteHeader
 import app.ma3.ui.components.routeDetailsScreen.RouteMapPlaceholder
 import app.ma3.ui.components.routeDetailsScreen.RouteStep
@@ -18,15 +21,15 @@ import app.ma3.ui.theme.WarmWhite
 @Composable
 fun RouteDetailsScreen(
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    routeData: RouteData? = null
 ) {
-    // Sample data - in a real app, this would come from parameters or state or props
-    // TODO: intergrate with retrofit for fetch these
-    val sampleSteps = listOf(
+    // Fallback sample data for offline/development mode
+    val fallbackSteps = listOf(
         RouteStep(
             stepNumber = 1,
             instruction = "Board Matatu 32 at Kencom",
-            fare = "Ksh 50" // TODO CHANGE THIS TO NUMBER
+            fare = "Ksh 50"
         ),
         RouteStep(
             stepNumber = 2,
@@ -53,18 +56,22 @@ fun RouteDetailsScreen(
             onBackClick = onNavigateBack
         )
         Spacer(modifier = Modifier.height(24.dp))
+        val from = routeData?.fromLocation ?: "Kencom"
+        val to = routeData?.toLocation ?: "Buru Buru"
+        val steps = routeData?.steps ?: fallbackSteps
+        val totalFare = routeData?.totalFare ?: "Ksh 120"
 
         RouteMapPlaceholder(
-            fromLocation = "Kencom",
-            toLocation = "Buru Buru",
+            fromLocation = from,
+            toLocation = to,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         RouteStepsList(
-            steps = sampleSteps,
-            totalFare = "Ksh 120", // TODO CHANGE THIS TO NUMBER WHICH IS CALCULATED
+            steps = steps,
+            totalFare = totalFare,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 

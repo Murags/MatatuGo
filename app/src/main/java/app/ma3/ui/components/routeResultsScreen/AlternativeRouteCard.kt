@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.ma3.data.repository.RouteData
 import app.ma3.ui.theme.AltCardBg
 import app.ma3.ui.theme.AltCardBorder
 import app.ma3.ui.theme.BlueRouteDot
@@ -39,7 +40,7 @@ import app.ma3.ui.theme.OrangePrimary
 import kotlin.text.trim
 
 @Composable
-fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
+fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -67,8 +68,8 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 val routePath = run {
-                    val fromTrim = route.from.trim()
-                    val toTrim = route.to.trim()
+                    val fromTrim = route.fromLocation.trim()
+                    val toTrim = route.toLocation.trim()
                     if (fromTrim.endsWith(toTrim, ignoreCase = true)) {
                         fromTrim
                     } else {
@@ -108,7 +109,7 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = route.duration,
+                            text = "${route.steps.size} steps",
                             style = MaterialTheme.typography.bodySmall,
                             color = GraySectionIcon
                         )
@@ -123,7 +124,7 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${route.matatus} matatu${if (route.matatus > 1) "s" else ""}",
+                            text = "Stops ${route.steps.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = GraySectionIcon
                         )
@@ -142,12 +143,12 @@ fun AlternativeRouteCard(route: Route, cheapestCost: Int) {
                             color = GraySectionIcon
                         )
                         Text(
-                            text = "Ksh ${route.cost}",
+                            text = route.totalFare,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "+Ksh ${route.cost - cheapestCost} more",
+                            text = "+Ksh ${(route.totalFare.filter { it.isDigit() }.toIntOrNull() ?: 0) - cheapestCost} more",
                             style = MaterialTheme.typography.labelSmall,
                             color = OrangePrimary
                         )

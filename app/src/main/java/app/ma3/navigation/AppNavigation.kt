@@ -9,8 +9,6 @@ import androidx.navigation.compose.rememberNavController
 import app.ma3.ui.screens.HomeScreen
 import app.ma3.ui.screens.ProfileScreen
 import app.ma3.ui.screens.RouteDetailsScreen
-import app.ma3.ui.screens.SignInScreen
-import app.ma3.ui.screens.SignUpScreen
 
 @Composable
 fun AppNavigation(
@@ -19,30 +17,21 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.SIGN_IN, // Start at Sign-In for now
+        startDestination = Routes.HOME,
         modifier = modifier
     ) {
-        // Sign In Screen
-        composable(Routes.SIGN_IN) {
-            SignInScreen(
-                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) },
-                onSignInSuccess = { navController.navigate(Routes.HOME) }
-            )
-        }
-
-        // Sign Up Screen
-        composable(Routes.SIGN_UP) {
-            SignUpScreen(
-                onNavigateToSignIn = { navController.navigate(Routes.SIGN_IN) },
-                onSignUpSuccess = { navController.navigate(Routes.HOME) }
-            )
-        }
-
-        // Home Screen
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
-                onNavigateToRouteDetails = { navController.navigate(Routes.ROUTE_DETAILS) }
+                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onNavigateToHelp = { navController.navigate(Routes.HELP) }
+            )
+        }
+
+        composable(Routes.SIGNIN) {
+            SignInScreen(
+                onNavigateToHomeScreen = { navController.navigate(Routes.HOME) },
+                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) }
             )
         }
 
@@ -55,10 +44,32 @@ fun AppNavigation(
 
         // Route Details Screen
         composable(Routes.ROUTE_DETAILS) {
+            val selectedRoute = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<RouteData>("selectedRoute")
+
             RouteDetailsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                routeData = selectedRoute
+            )
+        }
+
+        composable(Routes.ROUTE_RESULTS) {
+            RouteResultsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToRouteDetails = { route ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selectedRoute", route)
+                    navController.navigate(Routes.ROUTE_DETAILS)
+                }
+            )
+        }
+
+        composable(Routes.HELP) {
+            HelpScreen(
                 onNavigateBack = { navController.navigateUp() }
             )
         }
     }
 }
-

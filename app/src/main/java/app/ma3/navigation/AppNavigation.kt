@@ -9,6 +9,13 @@ import androidx.navigation.compose.rememberNavController
 import app.ma3.ui.screens.HomeScreen
 import app.ma3.ui.screens.ProfileScreen
 import app.ma3.ui.screens.RouteDetailsScreen
+import app.ma3.ui.screens.RouteResultsScreen
+import app.ma3.ui.screens.SignInScreen
+import app.ma3.ui.screens.SignUpScreen
+import app.ma3.ui.screens.HelpScreen
+import app.ma3.data.repository.RouteData
+
+
 
 @Composable
 fun AppNavigation(
@@ -17,7 +24,7 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME,
+        startDestination = Routes.SIGNIN,
         modifier = modifier
     ) {
         composable(Routes.HOME) {
@@ -31,7 +38,15 @@ fun AppNavigation(
         composable(Routes.SIGNIN) {
             SignInScreen(
                 onNavigateToHomeScreen = { navController.navigate(Routes.HOME) },
-                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) }
+                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) }
+            )
+        }
+
+        composable(Routes.SIGN_UP) {
+            SignUpScreen(
+                onNavigateToSignIn = { navController.navigate(Routes.SIGNIN) },
+                onSignUpSuccess = { navController.navigate(Routes.HOME) }
             )
         }
 

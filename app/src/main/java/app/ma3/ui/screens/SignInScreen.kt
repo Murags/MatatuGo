@@ -1,4 +1,4 @@
-package app.ma3.signin
+package app.ma3.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,14 +31,16 @@ import app.ma3.ui.theme.MatatuYellow
  * - Gradient background
  * - App title and tagline
  * - Email and password input fields
- * - "Forgot Password?" link
- * - Sign In button
- * - Inline "Don't have an account? Sign Up" text
+ * - "Forgot Password?" link (currently inactive)
+ * - "Sign In" button
+ * - Inline "Don't have an account? Sign Up" link
  */
 @Composable
 fun SignInScreen(
+    onNavigateToSignUp: () -> Unit = {},
+    onSignInSuccess: () -> Unit = {},
     onNavigateToHomeScreen: () -> Unit = {},
-    onNavigateToRouteResults: () -> Unit = {},
+    onNavigateToRouteResults: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -158,9 +160,9 @@ fun SignInScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
-            // "Forgot Password?" link
+            // "Forgot Password?" link (currently placeholder)
             TextButton(
-                onClick = { /* TODO: handle forgot password */ },
+                onClick = { /* TODO: Handle forgot password flow */ },
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text(
@@ -173,7 +175,7 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Sign In button
+            // "Sign In" button
             Button(
                 onClick = {onNavigateToHomeScreen()},
                 modifier = Modifier
@@ -192,7 +194,7 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // "Don't have an account?" inline with "Sign Up"
+            // Inline "Don't have an account?" with "Sign Up"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -203,7 +205,7 @@ fun SignInScreen(
                     color = Color(0xFF6B6B6B),
                     fontSize = 14.sp
                 )
-                TextButton(onClick = { /* TODO: navigate to sign up */ }) {
+                TextButton(onClick = { onNavigateToSignUp() }) {
                     Text(
                         text = "Sign Up",
                         color = MatatuOrange,
@@ -225,6 +227,7 @@ fun SignInScreen(
 fun SignInScreenPreview() {
     SignInScreen()
 }
+
 
 
 

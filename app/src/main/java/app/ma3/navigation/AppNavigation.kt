@@ -10,9 +10,12 @@ import app.ma3.ui.screens.HomeScreen
 import app.ma3.ui.screens.ProfileScreen
 import app.ma3.ui.screens.RouteDetailsScreen
 import app.ma3.ui.screens.RouteResultsScreen
+import app.ma3.ui.screens.SignInScreen
+import app.ma3.ui.screens.SignUpScreen
 import app.ma3.ui.screens.HelpScreen
-import app.ma3.signin.SignInScreen
 import app.ma3.data.repository.RouteData
+
+
 
 @Composable
 fun AppNavigation(
@@ -24,8 +27,6 @@ fun AppNavigation(
         startDestination = Routes.SIGNIN,
         modifier = modifier
     ) {
-
-        // This is retired should be used when you have new screen and dont want to go through whole flow
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
@@ -37,16 +38,26 @@ fun AppNavigation(
         composable(Routes.SIGNIN) {
             SignInScreen(
                 onNavigateToHomeScreen = { navController.navigate(Routes.HOME) },
-                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) }
+                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) }
             )
         }
 
+        composable(Routes.SIGN_UP) {
+            SignUpScreen(
+                onNavigateToSignIn = { navController.navigate(Routes.SIGNIN) },
+                onSignUpSuccess = { navController.navigate(Routes.HOME) }
+            )
+        }
+
+        // Profile Screen
         composable(Routes.PROFILE) {
             ProfileScreen(
                 onNavigateBack = { navController.navigateUp() }
             )
         }
 
+        // Route Details Screen
         composable(Routes.ROUTE_DETAILS) {
             val selectedRoute = navController.previousBackStackEntry
                 ?.savedStateHandle

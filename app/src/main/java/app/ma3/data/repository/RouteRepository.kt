@@ -36,7 +36,7 @@ class RouteRepository(
                 Result.success(mapped)
             } else {
                 val errorMsg = when (response.code()) {
-                    404 -> "Backend API not found. Please ensure your FastAPI server is running at http://192.168.1.11:8000 and the endpoint /api/routes/by-coordinates exists."
+                    404 -> "Backend API not found."
                     500 -> "Server error: ${response.message()}"
                     else -> "API error (${response.code()}): ${response.message()}"
                 }
@@ -44,7 +44,7 @@ class RouteRepository(
                 Result.failure(Exception(errorMsg))
             }
         } catch (e: java.net.ConnectException) {
-            val errorMsg = "Cannot connect to server at http://192.168.1.11:8000. Please check:\n1. Is your Django server running?\n2. Is your device on the same network?\n3. Is the IP address correct?"
+            val errorMsg = "Cannot connect to server"
             android.util.Log.e("MatatuRepository", errorMsg, e)
             Result.failure(Exception(errorMsg))
         } catch (e: Exception) {

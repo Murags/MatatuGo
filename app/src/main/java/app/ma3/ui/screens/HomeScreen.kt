@@ -9,10 +9,21 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,19 +32,97 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.ma3.ui.components.routeDetailsScreen.RouteMapPlaceholder
 import app.ma3.ui.components.publicComponents.RouteHeader
+import app.ma3.ui.components.LocationSearchField
+import app.ma3.data.repository.LocationSearchResult
+import app.ma3.ui.theme.MatatuOrange
+import app.ma3.ui.theme.MatatuYellow
 
 @Composable
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
-    onNavigateToRouteResults: () -> Unit = {},
+    onNavigateToRouteResults: (Double, Double, Double, Double) -> Unit = { _, _, _, _ -> },
     onNavigateToHelp: () -> Unit = {},
 ) {
-
-    var yourLocation by remember { mutableStateOf("") }
-    var destination by remember { mutableStateOf("") }
+    var originLocation by rememberSaveable { mutableStateOf<LocationSearchResult?>(null) }
+    var destinationLocation by rememberSaveable { mutableStateOf<LocationSearchResult?>(null) }
     var selectedTab by remember { mutableStateOf(0) }
+    var isLoadingLocation by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+
+    LaunchedEffect(Unit) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission && originLocation == null) {
+            isLoadingLocation = true
+            getCurrentLocation(
+                context = context,
+                onLocationReceived = { lat, lon ->
+                    originLocation = LocationSearchResult(
+                        displayName = "Current Location",
+                        latitude = lat,
+                        longitude = lon,
+                        type = "current_location"
+                    )
+                    isLoadingLocation = false
+                },
+                onError = {
+                    isLoadingLocation = false
+                }
+            )
+        }
+    }
+
+    // Location permission launcher (for when auto-fetch needs permission)
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        if (fineLocationGranted || coarseLocationGranted) {
+            // Permission granted, get location
+            isLoadingLocation = true
+            getCurrentLocation(
+                context = context,
+                onLocationReceived = { lat, lon ->
+                    originLocation = LocationSearchResult(
+                        displayName = "Current Location",
+                        latitude = lat,
+                        longitude = lon,
+                        type = "current_location"
+                    )
+                    isLoadingLocation = false
+                },
+                onError = {
+                    isLoadingLocation = false
+                }
+            )
+        } else {
+            isLoadingLocation = false
+        }
+    }
+
+    // Request permission on first load if not granted
+    LaunchedEffect(Unit) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasPermission) {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -42,7 +131,8 @@ fun HomeScreen(
                 RouteHeader(
                     title = "MatatuGo",
                     onBackClick = {},
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    showBackArrow = false
                 )
 
                 IconButton(
@@ -54,7 +144,7 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = "Profile",
-                        tint = colors.onPrimary,
+                        tint = Color.Black,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -72,108 +162,56 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                // Match RouteResults / RouteDetails gradient background
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFFFFDF7), // WarmWhite (same as Theme)
-                            Color(0xFFF1F1F1)
-                        )
-                    )
-                )
+                .background(Color(0xFFF5F5F5))
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                OutlinedTextField(
-                    value = yourLocation,
-                    onValueChange = { yourLocation = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    placeholder = {
-                        Text(
-                            "Your Location",
-                            color = colors.onSurface.copy(alpha = 0.6f),
-                            fontSize = 16.sp
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Location",
-                            tint = colors.onSurface,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = colors.onSurface,
-                        unfocusedTextColor = colors.onSurface.copy(alpha = 0.9f),
-                        disabledTextColor = colors.onSurface.copy(alpha = 0.6f),
-                        focusedContainerColor = colors.surface,
-                        unfocusedContainerColor = colors.surface,
-                        focusedBorderColor = colors.primary,
-                        unfocusedBorderColor = colors.onSurface.copy(alpha = 0.12f),
-                        cursorColor = colors.primary
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                LocationSearchField(
+                    label = if (isLoadingLocation) "Getting your location..." else "Your Location",
+                    selectedLocation = originLocation,
+                    onLocationSelected = { originLocation = it }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = destination,
-                    onValueChange = { destination = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    placeholder = {
-                        Text(
-                            "Destination",
-                            color = colors.onSurface.copy(alpha = 0.6f),
-                            fontSize = 16.sp
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = colors.onSurface,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = colors.onSurface,
-                        unfocusedTextColor = colors.onSurface.copy(alpha = 0.9f),
-                        disabledTextColor = colors.onSurface.copy(alpha = 0.6f),
-                        focusedContainerColor = colors.surface,
-                        unfocusedContainerColor = colors.surface,
-                        focusedBorderColor = colors.primary,
-                        unfocusedBorderColor = colors.onSurface.copy(alpha = 0.12f),
-                        cursorColor = colors.primary
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                LocationSearchField(
+                    label = "Destination",
+                    selectedLocation = destinationLocation,
+                    onLocationSelected = { destinationLocation = it },
+                    leadingIcon = Icons.Default.Search
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Use theme primary so button color matches RouteHeader (MatatuYellow)
                 Button(
-                    onClick = onNavigateToRouteResults,
+                    onClick = {
+                        val origin = originLocation
+                        val destination = destinationLocation
+                        if (origin != null && destination != null) {
+                            onNavigateToRouteResults(
+                                origin.latitude,
+                                origin.longitude,
+                                destination.latitude,
+                                destination.longitude
+                            )
+                        }
+                    },
+                    enabled = originLocation != null && destinationLocation != null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.primary,
-                        contentColor = colors.onPrimary
+                        containerColor = MatatuYellow,
+                        contentColor = Color.Black
                     ),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "Find Cheapest Route",
-                        color = colors.onPrimary,
+                        color = Color.Black,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -183,8 +221,8 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             RouteMapPlaceholder(
-                fromLocation = if (yourLocation.isBlank()) "Your Location" else yourLocation,
-                toLocation = if (destination.isBlank()) "Destination" else destination,
+                fromLocation = originLocation?.displayName ?: "Your Location",
+                toLocation = destinationLocation?.displayName ?: "Destination",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -228,7 +266,7 @@ fun BottomNavigationBar(
     val colors = MaterialTheme.colorScheme
 
     NavigationBar(
-        containerColor = colors.background,
+        containerColor = Color.White,
         contentColor = colors.onBackground
     ) {
         BottomNavItem(
@@ -249,6 +287,44 @@ fun BottomNavigationBar(
     }
 }
 
+/**
+ * Get current device location using Google Play Services
+ */
+private fun getCurrentLocation(
+    context: android.content.Context,
+    onLocationReceived: (Double, Double) -> Unit,
+    onError: () -> Unit
+) {
+    try {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        val cancellationTokenSource = CancellationTokenSource()
+
+        // Check permission again
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                cancellationTokenSource.token
+            ).addOnSuccessListener { location ->
+                if (location != null) {
+                    onLocationReceived(location.latitude, location.longitude)
+                } else {
+                    onError()
+                }
+            }.addOnFailureListener {
+                onError()
+            }
+        } else {
+            onError()
+        }
+    } catch (e: SecurityException) {
+        onError()
+    }
+}
+
 @Composable
 fun RowScope.BottomNavItem(
     icon: ImageVector,
@@ -263,14 +339,14 @@ fun RowScope.BottomNavItem(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(20.dp),
                 tint = if (selected) colors.primary else colors.onSurface.copy(alpha = 0.6f)
             )
         },
         label = {
             Text(
                 text = label,
-                fontSize = 12.sp,
+                fontSize = 10.sp,
                 color = if (selected) colors.primary else colors.onSurface.copy(alpha = 0.7f)
             )
         },

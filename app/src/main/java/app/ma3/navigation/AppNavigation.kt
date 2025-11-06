@@ -30,7 +30,17 @@ fun AppNavigation(
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
-                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onNavigateToRouteResults = { originLat, originLon, destLat, destLon ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("originLat", originLat)
+                            set("originLon", originLon)
+                            set("destLat", destLat)
+                            set("destLon", destLon)
+                        }
+                    navController.navigate(Routes.ROUTE_RESULTS)
+                },
                 onNavigateToHelp = { navController.navigate(Routes.HELP) }
             )
         }
@@ -70,6 +80,19 @@ fun AppNavigation(
         }
 
         composable(Routes.ROUTE_RESULTS) {
+            val originLat = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Double>("originLat")
+            val originLon = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Double>("originLon")
+            val destLat = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Double>("destLat")
+            val destLon = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Double>("destLon")
+
             RouteResultsScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToRouteDetails = { route ->
@@ -77,7 +100,11 @@ fun AppNavigation(
                         ?.savedStateHandle
                         ?.set("selectedRoute", route)
                     navController.navigate(Routes.ROUTE_DETAILS)
-                }
+                },
+                originLat = originLat,
+                originLon = originLon,
+                destLat = destLat,
+                destLon = destLon
             )
         }
 

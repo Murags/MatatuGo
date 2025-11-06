@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.ma3.data.repository.RouteData
@@ -31,9 +33,24 @@ fun RouteResultsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToRouteDetails: (RouteData) -> Unit = {},
+    originLat: Double? = null,
+    originLon: Double? = null,
+    destLat: Double? = null,
+    destLon: Double? = null,
     viewModel: RouteResultsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(originLat, originLon, destLat, destLon) {
+        if (originLat != null && originLon != null && destLat != null && destLon != null) {
+            viewModel.fetchRoutesByCoordinates(
+                originLat = originLat,
+                originLon = originLon,
+                destLat = destLat,
+                destLon = destLon
+            )
+        }
+    }
 
     // Helper to parse integer cost from formatted totalFare like "KSH 120"
     fun RouteData.costInt(): Int = totalFare.filter { it.isDigit() }.toIntOrNull() ?: Int.MAX_VALUE
@@ -85,18 +102,32 @@ fun RouteResultsScreen(
                             Text(
                                 text = "Error: ${uiState.error}",
                                 color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.headlineSmall
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { viewModel.fetchRoutesByCoordinates(
-                                originLat = -1.308665872,
-                                originLon = 36.81243896,
-                                destLat = -1.264457703,
-                                destLon = 36.74703598,
-                                searchRadius = 100,
-                                alternatives = 2
-                            ) }) {
-                                Text("Retry")
+                            if (originLat != null && originLon != null && destLat != null && destLon != null) {
+                                Button(onClick = {
+                                    viewModel.fetchRoutesByCoordinates(
+                                        originLat = originLat,
+                                        originLon = originLon,
+                                        destLat = destLat,
+                                        destLon = destLon
+                                    )
+                                }) {
+                                    Text("Retry Search")
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            Button(
+                                onClick = { onNavigateBack() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Text("Try Different Locations")
                             }
                         }
                     }

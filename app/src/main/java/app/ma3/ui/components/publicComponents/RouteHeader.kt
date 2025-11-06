@@ -20,7 +20,8 @@ fun RouteHeader(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color(0xFFF4D03F),
-    contentColor: Color = Color.Black
+    contentColor: Color = Color.Black,
+    showBackArrow: Boolean = true
 ) {
     Row(
         modifier = modifier
@@ -29,16 +30,17 @@ fun RouteHeader(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            tint = contentColor,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onBackClick() }
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
+        if (showBackArrow) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = contentColor,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onBackClick() }
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+        }
 
         Text(
             text = title,

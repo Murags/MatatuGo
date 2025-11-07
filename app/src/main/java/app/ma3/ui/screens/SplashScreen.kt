@@ -26,6 +26,7 @@ import app.ma3.R
 import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
 import kotlinx.coroutines.delay
+import java.sql.DriverManager.println
 
 /**
  * MatatuGo Splash Screen
@@ -34,7 +35,7 @@ import kotlinx.coroutines.delay
  * - Gradient background (orange → yellow)
  * - White Matatu icon
  * - App title and tagline
- * - Animated fade-in
+ * - Animated fade-in and fade-out transition
  * - Circular progress indicator
  * - Automatically navigates to Sign-In after a short delay
  */
@@ -42,17 +43,31 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     onTimeout: () -> Unit = {}
 ) {
-    // Create an alpha animation for fade-in
+    // Create an alpha animation for fade-in/fade-out
     val alpha = remember { Animatable(0f) }
+    val fadeDuration = 500 // Duration for the fade-out
 
     LaunchedEffect(Unit) {
-        // Fade in over 1.2s
+        // --- 1. Fade In ---
+        println("Splash screen started")
         alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 1200)
         )
-        // Stay visible for 2.5s total
-        delay(2500)
+
+        // --- 2. Display Time ---
+        // Stay visible (at full opacity) for 1.3s (2500ms total delay - 1200ms fade-in)
+        delay(3500)
+
+        // --- 3. Fade Out ---
+        println("Initiating splash fade-out")
+        alpha.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = fadeDuration)
+        )
+
+        // --- 4. Navigation ---
+        println("✅ Splash timeout reached")
         onTimeout()
     }
 
@@ -60,6 +75,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            // Apply the alpha value to the entire screen
             .graphicsLayer(alpha = alpha.value)
             .background(
                 brush = Brush.linearGradient(

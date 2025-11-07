@@ -6,35 +6,57 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import app.ma3.ui.screens.HomeScreen
-import app.ma3.ui.screens.ProfileScreen
-import app.ma3.ui.screens.RouteDetailsScreen
-import app.ma3.ui.screens.SignInScreen
-import app.ma3.ui.screens.SignUpScreen
+import app.ma3.ui.screens.*
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    // --- NEW PARAMETER: Callback to signal MainActivity that the splash is visually complete ---
+    onSplashFinished: () -> Unit = {}
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.SIGN_IN, // Start at Sign-In for now
+        startDestination = Routes.SPLASH, // Start with Splash Screen
         modifier = modifier
     ) {
-        // Sign In Screen
-        composable(Routes.SIGN_IN) {
-            SignInScreen(
-                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) },
-                onSignInSuccess = { navController.navigate(Routes.HOME) }
+        // Splash Screen
+        composable(Routes.SPLASH) {
+            SplashScreen(
+                onTimeout = {
+                    // 1. IMPORTANT: Signal MainActivity that the splash screen is done
+                    // This keeps the main content view attached until navigation completes.
+                    onSplashFinished()
+
+                    // 2. Navigate to Sign-In after splash delay
+                    navController.navigate(Routes.SIGN_IN) {
+                        popUpTo(Routes.SPLASH) { inclusive = true } // Prevent back to splash
+                    }
+                }
             )
         }
 
-        // Sign Up Screen
+        // Sign-In Screen
+        composable(Routes.SIGN_IN) {
+            SignInScreen(
+                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) },
+                onSignInSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGN_IN) { inclusive = true } // clear auth screens
+                    }
+                }
+            )
+        }
+
+        // Sign-Up Screen
         composable(Routes.SIGN_UP) {
             SignUpScreen(
                 onNavigateToSignIn = { navController.navigate(Routes.SIGN_IN) },
-                onSignUpSuccess = { navController.navigate(Routes.HOME) }
+                onSignUpSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGN_UP) { inclusive = true }
+                    }
+                }
             )
         }
 

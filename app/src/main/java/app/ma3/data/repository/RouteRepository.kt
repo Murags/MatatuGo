@@ -35,9 +35,20 @@ class RouteRepository(
                 val mapped = RouteMapper.fromCoordinateRoutes(response.body()!!)
                 Result.success(mapped)
             } else {
-                Result.failure(Exception("Coordinate search failed: ${response.code()}"))
+                val errorMsg = when (response.code()) {
+                    404 -> "Backend API not found."
+                    500 -> "Server error: ${response.message()}"
+                    else -> "API error (${response.code()}): ${response.message()}"
+                }
+                android.util.Log.e("MatatuRepository", errorMsg)
+                Result.failure(Exception(errorMsg))
             }
+        } catch (e: java.net.ConnectException) {
+            val errorMsg = "Cannot connect to server"
+            android.util.Log.e("MatatuRepository", errorMsg, e)
+            Result.failure(Exception(errorMsg))
         } catch (e: Exception) {
+            android.util.Log.e("MatatuRepository", "Unexpected error: ${e.message}", e)
             Result.failure(e)
         }
     }

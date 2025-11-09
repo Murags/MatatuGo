@@ -16,50 +16,59 @@ class RouteResultsViewModel(
     private val _uiState = MutableStateFlow(RouteResultsUiState())
     val uiState: StateFlow<RouteResultsUiState> = _uiState.asStateFlow()
 
-    init {
-        // placeholder before search is implemented
-        fetchRoutesByCoordinates(
-            originLat = -1.308665872,
-            originLon = 36.81243896,
-            destLat = -1.264457703,
-            destLon = 36.74703598,
-            searchRadius = 100,
-            alternatives = 2
-        )
-    }
-
     fun fetchRoutesByCoordinates(
         originLat: Double,
         originLon: Double,
         destLat: Double,
         destLon: Double,
-        searchRadius: Int = 100,
-        alternatives: Int = 2
+        searchRadius: Int = 500,
+        alternatives: Int = 3
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-            repository.searchRoutesByCoordinates(
-                originLat = originLat,
-                originLon = originLon,
-                destLat = destLat,
-                destLon = destLon,
-                searchRadius = searchRadius,
-                alternatives = alternatives
-            ).fold(
-                onSuccess = { routes ->
+            val radiiToTry = listOf(searchRadius, 1000, 1500)
+            var lastError: String? = null
+
+            for ((index, radius) in radiiToTry.withIndex()) {
+                val result = repository.searchRoutesByCoordinates(
+                    originLat = originLat,
+                    originLon = originLon,
+                    destLat = destLat,
+                    destLon = destLon,
+                    searchRadius = radius,
+                    alternatives = alternatives
+                )
+
+                result.fold(
+                    onSuccess = { routes ->
+                        if (routes.isNotEmpty()) {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                routes = routes,
+                                error = null
+                            )
+                            return@launch
+                        } else {
+                            lastError = "No routes found. Trying larger search area..."
+                        }
+                    },
+                    onFailure = { e ->
+                        lastError = e.message
+                    }
+                )
+                if (index < radiiToTry.size - 1) {
                     _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        routes = routes,
-                        error = null
+                        isLoading = true,
+                        error = "No routes found with ${radius}m radius. Expanding search to ${radiiToTry[index + 1]}m..."
                     )
-                },
-                onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = e.message ?: "Failed to load routes"
-                    )
+                    kotlinx.coroutines.delay(500)
                 }
+            }
+
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = lastError ?: "No routes found after trying search radii up to 1500m. Try different locations or check if your backend has data for this area."
             )
         }
     }

@@ -69,6 +69,12 @@ dependencies {
     // Google Play Services for Location
     implementation("com.google.android.gms:play-services-location:21.1.0")
 
+    // Mapbox Maps SDK
+    implementation("com.mapbox.maps:android:11.0.0")
+
+    // Navigation SDK (Temporarily commented out because it was causing conflicts)
+    // implementation("com.mapbox.navigation:android:2.19.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

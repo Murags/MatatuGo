@@ -9,13 +9,13 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,17 +24,15 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.ma3.ui.components.routeDetailsScreen.RouteMapPlaceholder
+import app.ma3.ui.components.routeDetailsScreen.MapboxMapComponent
 import app.ma3.ui.components.publicComponents.RouteHeader
 import app.ma3.ui.components.LocationSearchField
 import app.ma3.data.repository.LocationSearchResult
-import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
 
 @Composable
@@ -220,12 +218,12 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            RouteMapPlaceholder(
-                fromLocation = originLocation?.displayName ?: "Your Location",
-                toLocation = destinationLocation?.displayName ?: "Destination",
+            MapboxMapComponent(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(250.dp)  // or whatever height looks good on HomeScreen
                     .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
 
             Spacer(modifier = Modifier.height(16.dp))

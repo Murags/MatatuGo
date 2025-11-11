@@ -42,4 +42,3 @@ data class LocationSearchResult(
     val longitude: Double,
     val type: String
 ): Parcelable
-

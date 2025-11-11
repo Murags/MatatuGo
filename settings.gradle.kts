@@ -23,7 +23,8 @@ dependencyResolutionManagement {
             }
             credentials {
                 username = "mapbox"
-                password = "sk.eyJ1IjoiamFubnktaXMtYS1mdW5ueS1idW5ueSIsImEiOiJjbWh0NHBzMmwxZWhtMmxyMTR4dThoemVrIn0.69FVWhNoeaG-sbeuspe7vA"
+                // Read secret token from local.properties
+                password = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").get()
             }
         }
     }

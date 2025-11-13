@@ -16,6 +16,13 @@ class RouteResultsViewModel(
     private val _uiState = MutableStateFlow(RouteResultsUiState())
     val uiState: StateFlow<RouteResultsUiState> = _uiState.asStateFlow()
 
+    //cache: Map with coordinate key and routes as value
+    private val routeCache = mutableMapOf<String, List<RouteData>>()
+
+    private fun getCacheKey(originLat: Double, originLon: Double, destLat: Double, destLon: Double): String {
+        return "$originLat,$originLon,$destLat,$destLon"
+    }
+
     fun fetchRoutesByCoordinates(
         originLat: Double,
         originLon: Double,
@@ -25,6 +32,19 @@ class RouteResultsViewModel(
         alternatives: Int = 3
     ) {
         viewModelScope.launch {
+            val cacheKey = getCacheKey(originLat, originLon, destLat, destLon)
+
+            // Check if data is already in cache
+            if (routeCache.containsKey(cacheKey)) {
+                val cachedRoutes = routeCache[cacheKey]!!
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    routes = cachedRoutes,
+                    error = null
+                )
+                return@launch
+            }
+
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             val radiiToTry = listOf(searchRadius, 1000, 1500)
@@ -48,6 +68,7 @@ class RouteResultsViewModel(
                                 routes = routes,
                                 error = null
                             )
+                            routeCache[cacheKey] = routes
                             return@launch
                         } else {
                             lastError = "No routes found. Trying larger search area..."

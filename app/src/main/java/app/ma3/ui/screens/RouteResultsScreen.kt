@@ -203,7 +203,8 @@ fun RouteResultsScreen(
                         items(routes.drop(1)) { route ->
                             AlternativeRouteCard(
                                 route = route,
-                                cheapestCost = routes.first().costInt()
+                                cheapestCost = routes.first().costInt(),
+                                onNavigateToRouteDetails = onNavigateToRouteDetails
                             )
                         }
                     }

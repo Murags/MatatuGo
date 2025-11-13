@@ -10,10 +10,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import app.ma3.navigation.AppNavigation
 import app.ma3.ui.theme.Ma3Theme
+import app.ma3.data.network.NetworkModule
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        NetworkModule.init(this)
+
         enableEdgeToEdge()
         setContent {
             Ma3Theme {

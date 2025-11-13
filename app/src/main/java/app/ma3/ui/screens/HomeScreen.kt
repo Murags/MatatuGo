@@ -43,6 +43,8 @@ fun HomeScreen(
 ) {
     var originLocation by rememberSaveable { mutableStateOf<LocationSearchResult?>(null) }
     var destinationLocation by rememberSaveable { mutableStateOf<LocationSearchResult?>(null) }
+    var currentLat by remember { mutableStateOf<Double?>(null) }
+    var currentLon by remember { mutableStateOf<Double?>(null) }
     var selectedTab by remember { mutableStateOf(0) }
     var isLoadingLocation by remember { mutableStateOf(false) }
 
@@ -60,6 +62,8 @@ fun HomeScreen(
             getCurrentLocation(
                 context = context,
                 onLocationReceived = { lat, lon ->
+                    currentLat = lat
+                    currentLon = lon
                     originLocation = LocationSearchResult(
                         displayName = "Current Location",
                         latitude = lat,
@@ -88,6 +92,8 @@ fun HomeScreen(
             getCurrentLocation(
                 context = context,
                 onLocationReceived = { lat, lon ->
+                    currentLat = lat
+                    currentLon = lon
                     originLocation = LocationSearchResult(
                         displayName = "Current Location",
                         latitude = lat,

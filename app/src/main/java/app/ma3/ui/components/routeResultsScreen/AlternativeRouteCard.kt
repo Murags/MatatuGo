@@ -40,7 +40,7 @@ import app.ma3.ui.theme.OrangePrimary
 import kotlin.text.trim
 
 @Composable
-fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
+fun AlternativeRouteCard(route: RouteData, cheapestCost: Int, onNavigateToRouteDetails: (RouteData) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -132,9 +132,9 @@ fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
                 }
 
                 // Price and Button
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
@@ -155,11 +155,12 @@ fun AlternativeRouteCard(route: RouteData, cheapestCost: Int) {
                     }
 
                     Button(
-                        onClick = { /* TODO */ },
+                        onClick = { onNavigateToRouteDetails(route) },
+                        modifier = Modifier.height(40.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = GrayButtonBg
                         ),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Text(
                             text = "View",

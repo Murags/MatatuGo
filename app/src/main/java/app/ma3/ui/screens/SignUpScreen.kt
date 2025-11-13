@@ -19,11 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
+import app.ma3.ui.viewmodel.AuthViewModel
+import app.ma3.ui.viewmodel.AuthViewModelFactory
+import app.ma3.ui.viewmodel.SignupState
 
 /**
  * MatatuGo Sign-Up Screen
@@ -40,6 +45,17 @@ fun SignUpScreen(
     onNavigateToSignIn: () -> Unit = {},
     onSignUpSuccess: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(context)
+    )
+    val signupState by viewModel.signupState.collectAsState()
+
+    LaunchedEffect(signupState) {
+        if (signupState is SignupState.Success) {
+            onSignUpSuccess()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -166,23 +182,46 @@ fun SignUpScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
+            if (signupState is SignupState.Error) {
+                Text(
+                    text = (signupState as SignupState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Create Account Button
             Button(
-                onClick = { onSignUpSuccess() },
+                onClick = {
+                    viewModel.signup(
+                        name = fullName.trim(),
+                        email = email.trim(),
+                        password = password
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MatatuOrange)
+                colors = ButtonDefaults.buttonColors(containerColor = MatatuOrange),
+                enabled = signupState !is SignupState.Loading
             ) {
-                Text(
-                    text = "Create Account",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                if (signupState is SignupState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Text(
+                        text = "Create Account",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

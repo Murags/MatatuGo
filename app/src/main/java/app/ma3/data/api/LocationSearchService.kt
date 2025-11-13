@@ -10,7 +10,7 @@ interface LocationSearchService {
         @Query("q") query: String,
         @Query("format") format: String = "json",
         @Query("countrycodes") countryCode: String = "ke",
-        @Query("limit") limit: Int = 5,
+        @Query("limit") limit: Int = 10,
         @Query("addressdetails") addressDetails: Int = 1
     ): Response<List<NominatimResult>>
 }

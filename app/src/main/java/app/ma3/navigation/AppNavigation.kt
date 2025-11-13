@@ -15,8 +15,6 @@ import app.ma3.ui.screens.SignUpScreen
 import app.ma3.ui.screens.HelpScreen
 import app.ma3.data.repository.RouteData
 
-
-
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,

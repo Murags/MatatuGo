@@ -1,7 +1,10 @@
 package app.ma3.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,17 +17,26 @@ import app.ma3.ui.screens.SignInScreen
 import app.ma3.ui.screens.SignUpScreen
 import app.ma3.ui.screens.HelpScreen
 import app.ma3.data.repository.RouteData
+import app.ma3.data.preferences.TokenManager
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
+    val tokenManager = TokenManager(context)
+    val accessToken by tokenManager.accessToken.collectAsState(initial = null)
+    val isLoggedIn = !accessToken.isNullOrEmpty()
+
+    val startDestination = if (isLoggedIn) Routes.HOME else Routes.SIGNIN
+
     NavHost(
         navController = navController,
-        startDestination = Routes.SIGNIN,
+        startDestination = startDestination,
         modifier = modifier
     ) {
+
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
@@ -45,8 +57,7 @@ fun AppNavigation(
 
         composable(Routes.SIGNIN) {
             SignInScreen(
-                onNavigateToHomeScreen = { navController.navigate(Routes.HOME) },
-                onNavigateToRouteResults = { navController.navigate(Routes.ROUTE_RESULTS) },
+                onSignInSuccess = { navController.navigate(Routes.HOME) },
                 onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) }
             )
         }
@@ -61,7 +72,15 @@ fun AppNavigation(
         // Profile Screen
         composable(Routes.PROFILE) {
             ProfileScreen(
-                onNavigateBack = { navController.navigateUp() }
+                onNavigateBack = { navController.navigateUp() },
+                onLogout = {
+                    navController.navigate(Routes.SIGNIN) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 

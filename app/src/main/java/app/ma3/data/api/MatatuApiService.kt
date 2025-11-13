@@ -6,7 +6,7 @@ import retrofit2.Response
 import retrofit2.http.*
 
 /**
- * Simple API service for matatu routes
+ * API service for matatu routes
  */
 interface MatatuApiService {
     @GET("routes/by-coordinates")

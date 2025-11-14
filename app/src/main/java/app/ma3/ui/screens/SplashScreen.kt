@@ -10,6 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,10 +25,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.ma3.R
+import app.ma3.data.preferences.TokenManager
 import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
 import kotlinx.coroutines.delay
-import java.sql.DriverManager.println
 
 /**
  * MatatuGo Splash Screen
@@ -37,38 +39,39 @@ import java.sql.DriverManager.println
  * - App title and tagline
  * - Animated fade-in and fade-out transition
  * - Circular progress indicator
- * - Automatically navigates to Sign-In after a short delay
+ * - Checks authentication status and navigates accordingly
  */
 @Composable
 fun SplashScreen(
-    onTimeout: () -> Unit = {}
+    onTimeout: (Boolean) -> Unit = {},
+    tokenManager: TokenManager? = null
 ) {
+    val accessToken by tokenManager?.accessToken?.collectAsState(initial = null) ?: remember { androidx.compose.runtime.mutableStateOf(null) }
     // Create an alpha animation for fade-in/fade-out
     val alpha = remember { Animatable(0f) }
     val fadeDuration = 500 // Duration for the fade-out
 
     LaunchedEffect(Unit) {
         // --- 1. Fade In ---
-        println("Splash screen started")
         alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 1200)
         )
 
         // --- 2. Display Time ---
-        // Stay visible (at full opacity) for 1.3s (2500ms total delay - 1200ms fade-in)
-        delay(3500)
+        // Stay visible (at full opacity) for 2.5s total
+        delay(2500)
 
         // --- 3. Fade Out ---
-        println("Initiating splash fade-out")
         alpha.animateTo(
             targetValue = 0f,
             animationSpec = tween(durationMillis = fadeDuration)
         )
 
         // --- 4. Navigation ---
-        println("✅ Splash timeout reached")
-        onTimeout()
+        // Check if user is logged in (has valid access token)
+        val isLoggedIn = !accessToken.isNullOrEmpty()
+        onTimeout(isLoggedIn)
     }
 
     // Background gradient and content

@@ -1,7 +1,8 @@
 package app.ma3.navigation
 
 object Routes {
-    const val SIGNIN = "signin"
+    const val SPLASH = "splash"
+    const val SIGN_IN = "signin"
     const val SIGN_UP = "signup"
     const val HOME = "home"
     const val PROFILE = "profile"

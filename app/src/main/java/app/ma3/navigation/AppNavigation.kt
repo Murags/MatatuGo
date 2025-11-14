@@ -10,10 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-// Import all screens in one go
 import app.ma3.ui.screens.*
 
-import app.ma3.data.RouteData
+import app.ma3.data.repository.RouteData
 import app.ma3.data.preferences.TokenManager
 
 @Composable
@@ -24,11 +23,6 @@ fun AppNavigation(
 ) {
     val context = LocalContext.current
     val tokenManager = TokenManager(context)
-    val accessToken by tokenManager.accessToken.collectAsState(initial = null)
-    val isLoggedIn = !accessToken.isNullOrEmpty()
-
-    // Determine start destination after splash
-    val startDestination = if (isLoggedIn) Routes.HOME else Routes.SIGN_IN
 
     NavHost(
         navController = navController,
@@ -36,16 +30,19 @@ fun AppNavigation(
         modifier = modifier
     ) {
 
-        // ---------------------- SPLASH SCREEN ---------------------- //
         composable(Routes.SPLASH) {
+            val accessToken by tokenManager.accessToken.collectAsState(initial = null)
+
             SplashScreen(
-                onTimeout = {
+                onTimeout = { isLoggedIn ->
                     onSplashFinished()
 
-                    navController.navigate(startDestination) {
+                    val destination = if (isLoggedIn) Routes.HOME else Routes.SIGN_IN
+                    navController.navigate(destination) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
-                }
+                },
+                tokenManager = tokenManager
             )
         }
 
@@ -72,7 +69,6 @@ fun AppNavigation(
             )
         }
 
-        // ---------------------- MAIN APP SCREENS ---------------------- //
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
@@ -107,7 +103,6 @@ fun AppNavigation(
             )
         }
 
-        // ---------------------- ROUTE RESULTS ---------------------- //
         composable(Routes.ROUTE_RESULTS) {
             val entry = navController.previousBackStackEntry?.savedStateHandle
 
@@ -132,7 +127,6 @@ fun AppNavigation(
             )
         }
 
-        // ---------------------- ROUTE DETAILS ---------------------- //
         composable(Routes.ROUTE_DETAILS) {
             val selectedRoute =
                 navController.previousBackStackEntry

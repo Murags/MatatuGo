@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -79,7 +80,6 @@ fun HomeScreen(
         }
     }
 
-    // Location permission launcher (for when auto-fetch needs permission)
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -87,7 +87,6 @@ fun HomeScreen(
         val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
 
         if (fineLocationGranted || coarseLocationGranted) {
-            // Permission granted, get location
             isLoadingLocation = true
             getCurrentLocation(
                 context = context,
@@ -111,7 +110,6 @@ fun HomeScreen(
         }
     }
 
-    // Request permission on first load if not granted
     LaunchedEffect(Unit) {
         val hasPermission = ContextCompat.checkSelfPermission(
             context,
@@ -158,7 +156,8 @@ fun HomeScreen(
             BottomNavigationBar(
                 selectedTab = selectedTab,
                 onTabSelected = { selectedTab = it },
-                onNavigateToHelp = onNavigateToHelp
+                onNavigateToHelp = onNavigateToHelp,
+                onNavigateToProfile = onNavigateToProfile
             )
         }
     ) { paddingValues ->
@@ -188,7 +187,7 @@ fun HomeScreen(
                     leadingIcon = Icons.Default.Search
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
                     onClick = {
@@ -227,7 +226,7 @@ fun HomeScreen(
             MapboxMapComponent(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)  // or whatever height looks good on HomeScreen
+                    .height(280.dp)  // or whatever height looks good on HomeScreen
                     .padding(horizontal = 16.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
@@ -265,7 +264,8 @@ fun HomeScreen(
 fun BottomNavigationBar(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
-    onNavigateToHelp: () -> Unit
+    onNavigateToHelp: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
 
@@ -286,6 +286,15 @@ fun BottomNavigationBar(
             onClick = {
                 onTabSelected(1)
                 onNavigateToHelp()
+            }
+        )
+        BottomNavItem(
+            icon = Icons.Default.Person,
+            label = "Profile",
+            selected = selectedTab == 2,
+            onClick = {
+                onTabSelected(2)
+                onNavigateToProfile()
             }
         )
     }

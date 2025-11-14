@@ -1,7 +1,7 @@
 package app.ma3.data.model
 
 /**
- * Simple data models for API responses
+ * This is obsolete
  */
 data class RouteResponse(
     val id: String?,

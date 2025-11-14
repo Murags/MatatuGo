@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Star
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.ma3.data.repository.RouteData
 import app.ma3.ui.components.publicComponents.RouteHeader
@@ -26,6 +28,7 @@ import app.ma3.ui.components.routeResultsScreen.AlternativeRouteCard
 import app.ma3.ui.components.routeResultsScreen.RouteTipCard
 import app.ma3.ui.theme.*
 import app.ma3.ui.viewmodel.RouteResultsViewModel
+import app.ma3.ui.components.icons.NoRouteIcon
 
 @Composable
 fun RouteResultsScreen(
@@ -91,58 +94,64 @@ fun RouteResultsScreen(
                     }
                 }
 
-                uiState.error != null -> {
-                    item {
-                        Column(
-                            modifier = Modifier.fillParentMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Error: ${uiState.error}",
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyLarge,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            if (originLat != null && originLon != null && destLat != null && destLon != null) {
-                                Button(onClick = {
-                                    viewModel.fetchRoutesByCoordinates(
-                                        originLat = originLat,
-                                        originLon = originLon,
-                                        destLat = destLat,
-                                        destLon = destLon
-                                    )
-                                }) {
-                                    Text("Retry Search")
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-
-                            Button(
-                                onClick = { onNavigateBack() },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondary
-                                )
-                            ) {
-                                Text("Try Different Locations")
-                            }
-                        }
-                    }
-                }
-
-                routes.isEmpty() -> {
+                uiState.error != null || routes.isEmpty() -> {
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "No routes found for the given criteria.",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = Color.Gray
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = NoRouteIcon,
+                                    contentDescription = "No routes found",
+                                    modifier = Modifier.size(120.dp),
+                                    tint = Color(0xFFE74C3C)
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Text(
+                                    text = "No route found for that destination",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2C3E50),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "Please check your destination\nor try again later",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                Button(
+                                    onClick = { onNavigateBack() },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MatatuYellow,
+                                        contentColor = Color.Black
+                                    ),
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp)
+                                        .padding(horizontal = 16.dp)
+                                ) {
+                                    Text(
+                                        text = "Try Again",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
                         }
                     }
                 }

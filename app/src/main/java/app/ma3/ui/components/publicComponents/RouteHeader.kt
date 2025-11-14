@@ -27,7 +27,7 @@ fun RouteHeader(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (showBackArrow) {

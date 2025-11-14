@@ -13,14 +13,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.ma3.navigation.AppNavigation
 import app.ma3.ui.theme.Ma3Theme
+import app.ma3.data.network.NetworkModule
 // import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen // Uncomment if using Android 12+ system splash screen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Optional: If you are using the modern Android 12+ system splash screen API:
+        // Optional: If using the modern Android 12+ system splash screen API:
         // val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
+
+        NetworkModule.init(this)
+
         enableEdgeToEdge()
 
         // --- NEW STATE: Tracks when the Compose splash screen is visually complete ---

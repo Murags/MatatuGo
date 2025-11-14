@@ -18,11 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.ma3.ui.theme.MatatuOrange
 import app.ma3.ui.theme.MatatuYellow
+import app.ma3.ui.viewmodel.AuthViewModel
+import app.ma3.ui.viewmodel.AuthViewModelFactory
+import app.ma3.ui.viewmodel.LoginState
 
 /**
  * MatatuGo Sign-In Screen
@@ -38,10 +43,19 @@ import app.ma3.ui.theme.MatatuYellow
 @Composable
 fun SignInScreen(
     onNavigateToSignUp: () -> Unit = {},
-    onSignInSuccess: () -> Unit = {},
-    onNavigateToHomeScreen: () -> Unit = {},
-    onNavigateToRouteResults: () -> Unit = {}
+    onSignInSuccess: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(context)
+    )
+    val loginState by viewModel.loginState.collectAsState()
+
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            onSignInSuccess()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -84,7 +98,8 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             // Email input field
-            var email by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("dennis@example.com") } // Pre-fill for testing
+            var password by remember { mutableStateOf("root") } // Pre-fill for testing
 
             TextField(
                 value = email,
@@ -122,7 +137,6 @@ fun SignInScreen(
             )
 
             // Password input field
-            var password by remember { mutableStateOf("") }
 
             TextField(
                 value = password,
@@ -160,6 +174,15 @@ fun SignInScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
+            if (loginState is LoginState.Error) {
+                Text(
+                    text = (loginState as LoginState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
+
             // "Forgot Password?" link (currently placeholder)
             TextButton(
                 onClick = { /* TODO: Handle forgot password flow */ },
@@ -177,19 +200,29 @@ fun SignInScreen(
 
             // "Sign In" button
             Button(
-                onClick = {onNavigateToHomeScreen()},
+                onClick = {
+                    viewModel.login(email.trim(), password)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MatatuOrange)
+                colors = ButtonDefaults.buttonColors(containerColor = MatatuOrange),
+                enabled = loginState !is LoginState.Loading
             ) {
-                Text(
-                    text = "Sign In",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                if (loginState is LoginState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Text(
+                        text = "Sign In",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

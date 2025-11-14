@@ -75,6 +75,9 @@ dependencies {
     // Navigation SDK (Temporarily commented out because it was causing conflicts)
     // implementation("com.mapbox.navigation:android:2.19.0")
 
+    // DataStore for preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

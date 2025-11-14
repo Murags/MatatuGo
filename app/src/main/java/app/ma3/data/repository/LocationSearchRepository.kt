@@ -14,7 +14,7 @@ class LocationSearchRepository(
         }
 
         return try {
-            val response = searchService.searchLocation(query)
+            val response = searchService.searchLocation(query = query)
 
             if (response.isSuccessful && response.body() != null) {
                 val results = response.body()!!.map { nominatim ->
@@ -34,6 +34,7 @@ class LocationSearchRepository(
         }
     }
 }
+
 
 @Parcelize
 data class LocationSearchResult(

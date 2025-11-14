@@ -9,119 +9,95 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import app.ma3.ui.screens.HomeScreen
-import app.ma3.ui.screens.ProfileScreen
-import app.ma3.ui.screens.RouteDetailsScreen
-import app.ma3.ui.screens.RouteResultsScreen
-import app.ma3.ui.screens.SignInScreen
-import app.ma3.ui.screens.SignUpScreen
-import app.ma3.ui.screens.HelpScreen
-import app.ma3.data.repository.RouteData
+
+// Import all screens in one go
+import app.ma3.ui.screens.*
+
+import app.ma3.data.RouteData
 import app.ma3.data.preferences.TokenManager
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onSplashFinished: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val tokenManager = TokenManager(context)
     val accessToken by tokenManager.accessToken.collectAsState(initial = null)
     val isLoggedIn = !accessToken.isNullOrEmpty()
 
-    val startDestination = if (isLoggedIn) Routes.HOME else Routes.SIGNIN
+    // Determine start destination after splash
+    val startDestination = if (isLoggedIn) Routes.HOME else Routes.SIGN_IN
 
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = Routes.SPLASH,
         modifier = modifier
     ) {
 
+        // ---------------------- SPLASH SCREEN ---------------------- //
+        composable(Routes.SPLASH) {
+            SplashScreen(
+                onTimeout = {
+                    onSplashFinished()
+
+                    navController.navigate(startDestination) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // ---------------------- AUTH SCREENS ---------------------- //
+        composable(Routes.SIGN_IN) {
+            SignInScreen(
+                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) },
+                onSignInSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGN_IN) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Routes.SIGN_UP) {
+            SignUpScreen(
+                onNavigateToSignIn = { navController.navigate(Routes.SIGN_IN) },
+                onSignUpSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGN_UP) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // ---------------------- MAIN APP SCREENS ---------------------- //
         composable(Routes.HOME) {
             HomeScreen(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
                 onNavigateToRouteResults = { originLat, originLon, destLat, destLon ->
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("originLat", originLat)
-                            set("originLon", originLon)
-                            set("destLat", destLat)
-                            set("destLon", destLon)
-                        }
+                    navController.currentBackStackEntry?.savedStateHandle?.apply {
+                        set("originLat", originLat)
+                        set("originLon", originLon)
+                        set("destLat", destLat)
+                        set("destLon", destLon)
+                    }
                     navController.navigate(Routes.ROUTE_RESULTS)
                 },
                 onNavigateToHelp = { navController.navigate(Routes.HELP) }
             )
         }
 
-        composable(Routes.SIGNIN) {
-            SignInScreen(
-                onSignInSuccess = { navController.navigate(Routes.HOME) },
-                onNavigateToSignUp = { navController.navigate(Routes.SIGN_UP) }
-            )
-        }
-
-        composable(Routes.SIGN_UP) {
-            SignUpScreen(
-                onNavigateToSignIn = { navController.navigate(Routes.SIGNIN) },
-                onSignUpSuccess = { navController.navigate(Routes.HOME) }
-            )
-        }
-
-        // Profile Screen
         composable(Routes.PROFILE) {
             ProfileScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onLogout = {
-                    navController.navigate(Routes.SIGNIN) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
+                    navController.navigate(Routes.SIGN_IN) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
-            )
-        }
-
-        // Route Details Screen
-        composable(Routes.ROUTE_DETAILS) {
-            val selectedRoute = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<RouteData>("selectedRoute")
-
-            RouteDetailsScreen(
-                onNavigateBack = { navController.navigateUp() },
-                routeData = selectedRoute
-            )
-        }
-
-        composable(Routes.ROUTE_RESULTS) {
-            val originLat = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Double>("originLat")
-            val originLon = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Double>("originLon")
-            val destLat = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Double>("destLat")
-            val destLon = navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Double>("destLon")
-
-            RouteResultsScreen(
-                onNavigateBack = { navController.navigateUp() },
-                onNavigateToRouteDetails = { route ->
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("selectedRoute", route)
-                    navController.navigate(Routes.ROUTE_DETAILS)
-                },
-                originLat = originLat,
-                originLon = originLon,
-                destLat = destLat,
-                destLon = destLon
             )
         }
 
@@ -130,5 +106,44 @@ fun AppNavigation(
                 onNavigateBack = { navController.navigateUp() }
             )
         }
+
+        // ---------------------- ROUTE RESULTS ---------------------- //
+        composable(Routes.ROUTE_RESULTS) {
+            val entry = navController.previousBackStackEntry?.savedStateHandle
+
+            val originLat = entry?.get<Double>("originLat")
+            val originLon = entry?.get<Double>("originLon")
+            val destLat = entry?.get<Double>("destLat")
+            val destLon = entry?.get<Double>("destLon")
+
+            RouteResultsScreen(
+                originLat = originLat,
+                originLon = originLon,
+                destLat = destLat,
+                destLon = destLon,
+                onNavigateBack = { navController.navigateUp() },
+                onNavigateToRouteDetails = { route ->
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selectedRoute", route)
+
+                    navController.navigate(Routes.ROUTE_DETAILS)
+                }
+            )
+        }
+
+        // ---------------------- ROUTE DETAILS ---------------------- //
+        composable(Routes.ROUTE_DETAILS) {
+            val selectedRoute =
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<RouteData>("selectedRoute")
+
+            RouteDetailsScreen(
+                routeData = selectedRoute,
+                onNavigateBack = { navController.navigateUp() }
+            )
+        }
     }
 }
+

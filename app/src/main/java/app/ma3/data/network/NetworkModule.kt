@@ -1,6 +1,7 @@
 package app.ma3.data.network
 
 import android.content.Context
+import app.ma3.BuildConfig
 import app.ma3.data.api.AuthApiService
 import app.ma3.data.api.MatatuApiService
 import app.ma3.data.api.LocationSearchService
@@ -15,7 +16,8 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object NetworkModule {
 
-    private const val BASE_URL = "http://192.168.1.11:8000/api/"
+    private val BASE_URL = "http://${BuildConfig.BACKEND_IP}:8000/api/"
+
     private const val NOMINATIM_URL = "https://nominatim.openstreetmap.org/"
 
     private lateinit var tokenManager: TokenManager

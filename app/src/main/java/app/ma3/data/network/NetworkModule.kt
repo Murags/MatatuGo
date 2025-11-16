@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  */
 object NetworkModule {
 
-    private val BASE_URL = "http://${BuildConfig.BACKEND_IP}:8000/api/"
+    private val BASE_URL = "${BuildConfig.BACKEND_URL}/api/"
 
     private const val NOMINATIM_URL = "https://nominatim.openstreetmap.org/"
 

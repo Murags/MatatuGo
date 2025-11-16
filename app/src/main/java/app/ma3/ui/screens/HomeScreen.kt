@@ -35,6 +35,7 @@ import app.ma3.ui.components.publicComponents.RouteHeader
 import app.ma3.ui.components.LocationSearchField
 import app.ma3.data.repository.LocationSearchResult
 import app.ma3.ui.theme.MatatuYellow
+import com.mapbox.geojson.Point
 
 @Composable
 fun HomeScreen(
@@ -226,9 +227,15 @@ fun HomeScreen(
             MapboxMapComponent(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)  // or whatever height looks good on HomeScreen
+                    .height(280.dp)
                     .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp)),
+                originPoint = originLocation?.let  {
+                    Point.fromLngLat(it.longitude, it.latitude)
+                },
+                destinationPoint = destinationLocation?.let {
+                    Point.fromLngLat(it.longitude, it.latitude)
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

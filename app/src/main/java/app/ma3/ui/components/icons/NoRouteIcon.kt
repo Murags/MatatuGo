@@ -55,4 +55,3 @@ val NoRouteIcon: ImageVector
     }
 
 private var _noRouteIcon: ImageVector? = null
-

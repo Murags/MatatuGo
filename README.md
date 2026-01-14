@@ -11,6 +11,8 @@ MatatuGo is an Android mobile application designed to enhance the experience of 
 - [Coroutines Usage](#coroutines-usage)
 - [Getting Started](#getting-started)
 - [Build and Run](#build-and-run)
+- [Authors](#authors)
+- [Screenshots](#screenshots)
 
 ---
 

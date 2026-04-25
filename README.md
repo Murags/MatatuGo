@@ -17,7 +17,7 @@ MatatuGo is an Android mobile application designed to enhance the experience of 
 ---
 
 ## Project Overview
-MatatuGo is built using Kotlin and follows modern Android development practices. The project leverages Android Jetpack components, MVVM architecture, and may use coroutines for asynchronous operations.
+MatatuGo is built using Kotlin and follows modern Android development practices. The project leverages Android Jetpack components, MVVM architecture, and uses coroutines for asynchronous operations.
 
 ## Key Features
 - Matatu information

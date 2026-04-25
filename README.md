@@ -1,6 +1,6 @@
 # MatatuGo
 
-MatatuGo is an Android mobile application designed to enhance the experience of using Matatus (public transport vehicles) in Kenya. The app provides users with real-time information, route planning, and other features to make commuting easier and more efficient.
+MatatuGo is an Android mobile application designed to enhance the experience of using Matatus in Kenya. The app provides users with route planning, navigation, and relevant transport information to make commuting easier and more efficient. 
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -20,7 +20,7 @@ MatatuGo is an Android mobile application designed to enhance the experience of 
 MatatuGo is built using Kotlin and follows modern Android development practices. The project leverages Android Jetpack components, MVVM architecture, and may use coroutines for asynchronous operations.
 
 ## Key Features
-- Real-time Matatu tracking and information
+- Matatu information
 - Route planning and navigation
 - User-friendly interface
 - Integration with Android location services
@@ -29,7 +29,7 @@ MatatuGo is built using Kotlin and follows modern Android development practices.
 - **Language:** Kotlin
 - **Architecture Pattern:** MVVM (Model-View-ViewModel)
 - **UI:** Android XML layouts
-- **Asynchronous Operations:** Kotlin Coroutines (if present)
+- **Asynchronous Operations:** Kotlin Coroutines 
 - **Dependency Management:** Gradle
 
 ## Key Code and Components
@@ -43,15 +43,15 @@ The project uses several key dependencies (see `build.gradle.kts` for the full l
 - AndroidX libraries (AppCompat, Lifecycle, Navigation)
 - Kotlin Standard Library
 - Material Components
-- (Potentially) Retrofit, Room, or other Jetpack libraries
-- (Potentially) Coroutine libraries for async operations
+- Retrofit, Room, and other Jetpack libraries
+- Coroutine libraries for async operations
 
 ## Coroutines Usage
 **What is a Coroutine?**
 A coroutine is a concurrency design pattern in Kotlin that allows you to write asynchronous code in a sequential manner. Coroutines help manage background tasks such as network requests or database operations without blocking the main thread.
 
 **Are Coroutines Used in This Project?**
-To confirm coroutine usage, check for imports like `kotlinx.coroutines.*` or functions such as `suspend fun`, `launch`, or `async` in the codebase. If present, coroutines are used for background operations.
+Yes. Coroutines are used for background operations.
 
 ## Getting Started
 1. **Clone the repository:**
